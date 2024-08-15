@@ -1,0 +1,100 @@
+/* General styling for the question container */
+.single-question {
+    padding: 1rem;
+    border-top: 1px solid hsl(275, 100%, 97%);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    overflow: auto; /* Allow scrolling */
+    max-height: 200px; /* Adjust based on your layout */
+    position: relative; /* For positioning pseudo-elements */
+}
+
+/* Hide scrollbar for WebKit browsers (Chrome, Safari) */
+.single-question::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for Firefox */
+.single-question {
+    scrollbar-width: none;
+}
+
+/* Hide scrollbar for Internet Explorer, Edge, and older browsers */
+.single-question {
+    -ms-overflow-style: none;
+}
+
+/* Hover effect for the question container */
+.single-question:hover {
+    background-color: hsl(275, 100%, 95%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+}
+
+/* Styling for the question heading */
+.question-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem; /* Space between heading and answer */
+}
+
+/* Styling for the question text */
+h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    width: 100%;
+    transition: color 0.3s ease;
+}
+
+/* Hover effect for the heading text */
+.single-question:hover h2 {
+    color: hsl(275, 100%, 47%);
+}
+
+/* Styling for the button */
+button {
+    height: 1.5rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: none;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+/* Rotate button on focus */
+button:focus {
+    outline: none;
+    transform: rotate(180deg);
+}
+
+/* Styling for the answer text */
+p.answer {
+    color: hsl(292, 16%, 49%);
+    font-size: 0.9rem;
+    line-height: 1.4rem;
+    margin-top: 0.5rem;
+    animation: slide-down 0.3s ease forwards;
+}
+
+/* Slide-down animation for the answer */
+@keyframes slide-down {
+    from {
+        opacity: 0;
+        transform: translateY(-10%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Button size adjustment for larger screens */
+@media (min-width: 700px) {
+    button {
+        height: 1.75rem;
+    }
+}
