@@ -1,10 +1,9 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Downshift from 'downshift';
 import Accordion from "../components/FAQAccordion";
 import { data } from "../utils/data";
 import "./FAQPage.css";
 
-// Custom hook for debouncing input values
 function useDebounce(value, delay) {
     const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -24,12 +23,12 @@ function useDebounce(value, delay) {
 const FAQPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [userRole, setUserRole] = useState('user'); // Default user role
+    const [faqs, setFaqs] = useState(data); // Initial FAQ data
     const searchContainerRef = useRef(null);
 
-    // Debounced search term
     const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-    // Handle clicks outside the search container
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
@@ -39,6 +38,19 @@ const FAQPage = () => {
 
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    useEffect(() => {
+        // Fetch user role from local storage or another source
+        const role = localStorage.getItem('userRole');
+        setUserRole(role || 'user');
+
+        // Fetch FAQs from backend if needed
+        // Example:
+        // fetch('/faqs')
+        //     .then(response => response.json())
+        //     .then(data => setFaqs(data))
+        //     .catch(error => console.error('Error fetching FAQs:', error));
     }, []);
 
     const handleInputValueChange = (inputValue) => {
@@ -61,14 +73,32 @@ const FAQPage = () => {
         );
     };
 
-    const filteredData = filterData(data, debouncedSearchTerm);
+    const filteredData = filterData(faqs, debouncedSearchTerm);
+
+    const handleAddFAQ = () => {
+        // Navigate to or display form to add a new FAQ
+        console.log('Add FAQ');
+    };
+
+    const handleEditFAQ = (faqId) => {
+        // Navigate to or display form to edit the FAQ with the given id
+        console.log('Edit FAQ:', faqId);
+    };
+
+    const handleDeleteFAQ = (faqId) => {
+        // Remove FAQ with the given id
+        setFaqs(faqs.filter(faq => faq.id !== faqId));
+        console.log('Delete FAQ:', faqId);
+    };
 
     return (
         <div className="faq-page">
             <div className="faq-header">
                 <h1 className="faq-heading">Frequently Asked Questions</h1>
-                <p className="faq-subheading">Got questions about ReactJS? Well, we've got you covered :)
-                </p>
+                <p className="faq-subheading">Got questions about ReactJS? Well, we've got you covered :)</p>
+                {userRole === 'tech' && (
+                    <button onClick={handleAddFAQ} className="add-faq-button">Add FAQ</button>
+                )}
                 <Downshift
                     onChange={handleSearchChange}
                     itemToString={(item) => (item ? item.question : '')}
@@ -109,7 +139,7 @@ const FAQPage = () => {
                                     className={`faq-autosuggest-menu ${showDropdown ? 'open' : 'closed'}`}
                                 >
                                     {showDropdown &&
-                                        filterData(data, inputValue).map((item, index) => (
+                                        filterData(faqs, inputValue).map((item, index) => (
                                             <li
                                                 {...getItemProps({
                                                     key: item.id,
@@ -134,7 +164,13 @@ const FAQPage = () => {
             <div className="faq-content">
                 {filteredData.length > 0 ? (
                     filteredData.map((singleQuestion) => (
-                        <Accordion key={singleQuestion.id} question={singleQuestion} />
+                        <Accordion
+                            key={singleQuestion.id}
+                            question={singleQuestion}
+                            onEdit={() => handleEditFAQ(singleQuestion.id)}
+                            onDelete={() => handleDeleteFAQ(singleQuestion.id)}
+                            isEditable={userRole === 'tech'}
+                        />
                     ))
                 ) : (
                     <p className="faq-no-results">No results found</p>
