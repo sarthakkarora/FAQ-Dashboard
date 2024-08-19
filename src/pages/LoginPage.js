@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import './LoginPage.css';
+import axios from 'axios';
 
 const LoginPage = ({ onLogin }) => {
     const [showPassword, setShowPassword] = useState(false);
@@ -11,6 +12,8 @@ const LoginPage = ({ onLogin }) => {
     const [name, setName] = useState(""); 
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const backendUrl = "http://localhost:5000";
+
 
     const firstErrorRef = useRef(null);
 
@@ -49,14 +52,31 @@ const LoginPage = ({ onLogin }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
-            setLoading(true);
-            
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+          setLoading(true);
+      
+          try {
+            const response = await axios.post(`${backendUrl}/users/login`, {
+              email,
+              password,
+            });
+            if (response.status === 200 && response.data.message === 'Success') {
+              const userType = response.data.userType;
+              alert(`Login successful! You are a ${userType}`);  
+              onLogin();
+            } else {
+              alert('Login failed: ' + response.data);
+            }
+          } catch (error) {
+            if (error.response && error.response.data) {
+              alert('Error: ' + error.response.data);
+            } else {
+              alert('Login failed. Please try again.');
+            }
+          } finally {
             setLoading(false);
-            alert("Login successful");
-            onLogin(); 
+          }
         }
-    };
+      };
 
     const getPasswordStrength = (password) => {
         if (password.length < 6) return 'Weak';
